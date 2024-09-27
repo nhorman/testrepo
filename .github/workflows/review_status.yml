@@ -2,7 +2,7 @@ name: "Synchronize PR status with development board"
 
 on:
   pull_request_review:
-    types: [submitted, dismissed]
+    types: [submitted, edited, dismissed]
   workflow_dispatch:
     inputs:
       reviewer:
@@ -21,6 +21,8 @@ on:
         description: 'pr to act on'
         required: true
         type: string
+
+permissions: write-all
 
 env:
   GH_TOKEN: ${{ github.token }}
@@ -53,6 +55,12 @@ jobs:
         fi
     - name: "Identify associated issues"
       run: |
-        gh api graphql -f query="query { repository(owner:\"nhorman\", name:\"testrepo\") { pullRequest(number: ${PR_NUM}) { closingIssuesReferences(first: 10) { edges { node { number } } } } } }"
-
+        gh api graphql -f query="query { repository(owner:\"nhorman\", name:\"testrepo\") { pullRequest(number: ${PR_NUM}) { closingIssuesReferences(first: 10) { edges { node { number } } } } } }" > ./issues.json
+    - name: "Identify issues in project board"
+      run: |
+        for i in $(jq '.data.repository.pullRequest.closingIssuesReferences.edges[].node.number' ./issues.json)
+        do
+          echo " ISSUE $i "
+          gh api graphql -F issue=$i -f query='query( $issue: Int!) { repository(owner:"nhorman", name:"testrepo") { issue(number: 1) { projectItems(first: 50) { edges { node { project { title} fieldValueByName(name: "Committer Reviewer") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }'
+        done
 
