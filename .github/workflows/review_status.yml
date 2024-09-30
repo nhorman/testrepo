@@ -25,7 +25,7 @@ on:
 permissions: write-all
 
 env:
-  GH_TOKEN: ${{ github.token }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   sync_review_state:
