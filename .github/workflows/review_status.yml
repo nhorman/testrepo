@@ -61,6 +61,6 @@ jobs:
         for i in $(jq '.data.repository.pullRequest.closingIssuesReferences.edges[].node.number' ./issues.json)
         do
           echo " ISSUE $i "
-          gh api graphql -F issue=$i -f query='query( $issue: Int!) { repository(owner:"nhorman", name:"testrepo") { issue(number: 1) { projectItems(first: 50) { edges { node { project { title} fieldValueByName(name: "Committer Reviewer") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }'
+          gh api graphql -f query='query { repository(owner:"nhorman", name:"testrepo") { issue(number: 1) { projectItems(first: 50) { edges { node { project { title} fieldValueByName(name: "Committer Reviewer") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }'
         done
 
