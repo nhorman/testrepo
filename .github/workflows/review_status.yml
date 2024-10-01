@@ -74,7 +74,7 @@ jobs:
         for i in $(jq '.data.repository.pullRequest.closingIssuesReferences.edges[].node.number' ./issues.json)
         do
           echo " ISSUE $i "
-          gh api -F issue=$i -F reviewer="$REVIEWER" graphql -f query='query($issue: Int!, reviewer: String!) { repository(owner:"nhorman", name:"testrepo") { issue(number: $issue) { projectItems(first: 50) { edges { node { id project {title id field(name:"Review 1") { ... on ProjectV2SingleSelectField { id options(names: $reviewer) { id color} } } } fieldValueByName(name: "Review 1") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }' > ./review1.json
+          gh api -F issue=$i -F reviewer="$REVIEWER" graphql -f query='query($issue: Int!, $reviewer: [String!]) { repository(owner:"nhorman", name:"testrepo") { issue(number: $issue) { projectItems(first: 50) { edges { node { id project {title id field(name:"Review 1") { ... on ProjectV2SingleSelectField { id options(names: $reviewer) { id color} } } } fieldValueByName(name: "Review 1") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }' > ./review1.json
 
          jq '.' ./review1.json
          ASSIGNED_REVIEWER=$(jq -r '.data.repository.issue.projectItems.edges[0].node.fieldValueByName.status' ./review1.json)
