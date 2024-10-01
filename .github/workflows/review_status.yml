@@ -53,6 +53,19 @@ jobs:
           fi
           echo "PR_NUM=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
         fi
+    - name: "Select change color"
+      run: |
+        case "$ACTION" in
+        "approved")
+          echo "ACTION_COLOR=GREEN" >> $GITHUB_ENV
+          ;;
+        "changes_requested")
+          echo "ACTION_COLOR=RED" >> $GITHUB_ENV
+          ;;
+        "dismiss")
+          echo "ACTION_COLOR=GREY" >> $GITHUB_ENV
+          ;;
+        esac
     - name: "Identify associated issues"
       run: |
         gh api graphql -f query="query { repository(owner:\"nhorman\", name:\"testrepo\") { pullRequest(number: ${PR_NUM}) { closingIssuesReferences(first: 10) { edges { node { number } } } } } }" > ./issues.json
@@ -61,10 +74,10 @@ jobs:
         for i in $(jq '.data.repository.pullRequest.closingIssuesReferences.edges[].node.number' ./issues.json)
         do
           echo " ISSUE $i "
-          gh api graphql -f query='query { repository(owner:"nhorman", name:"testrepo") { issue(number: 1) { projectItems(first: 50) { edges { node { project { title} fieldValueByName(name: "Review 1") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }' > ./review1.json
-          gh api graphql -f query='query { repository(owner:"nhorman", name:"testrepo") { issue(number: 1) { projectItems(first: 50) { edges { node { project { title} fieldValueByName(name: "Review 2") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }' > ./review2.json
+          gh api -F issue=$i graphql -f query='query($issue: Int!) { repository(owner:"nhorman", name:"testrepo") { issue(number: $issue) { projectItems(first: 50) { edges { node { project {title id} id field(name:"Review 1") { ... on ProjectV2SingleSelectField { id } } fieldValueByName(name: "Review 1") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }' > ./review1.json
 
          jq '.' ./review1.json
-         jq '.' ./review2.json
+         ASSIGNED_REVIEWER=$(jq -r '.data.repository.issue.projectItems.edges[0].node.fieldValueByName.status' ./review1.json)
+         echo $ASSIGNED_REVIEWER
         done
 
