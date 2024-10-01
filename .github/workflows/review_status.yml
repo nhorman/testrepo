@@ -56,11 +56,15 @@ jobs:
     - name: "Identify associated issues"
       run: |
         gh api graphql -f query="query { repository(owner:\"nhorman\", name:\"testrepo\") { pullRequest(number: ${PR_NUM}) { closingIssuesReferences(first: 10) { edges { node { number } } } } } }" > ./issues.json
-    - name: "Identify issues in project board"
+    - name: "Find and update issues in project board"
       run: |
         for i in $(jq '.data.repository.pullRequest.closingIssuesReferences.edges[].node.number' ./issues.json)
         do
           echo " ISSUE $i "
-          gh api graphql -f query='query { repository(owner:"nhorman", name:"testrepo") { issue(number: 1) { projectItems(first: 50) { edges { node { project { title} fieldValueByName(name: "Committer Reviewer") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }'
+          gh api graphql -f query='query { repository(owner:"nhorman", name:"testrepo") { issue(number: 1) { projectItems(first: 50) { edges { node { project { title} fieldValueByName(name: "Review 1") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }' > ./review1.json
+          gh api graphql -f query='query { repository(owner:"nhorman", name:"testrepo") { issue(number: 1) { projectItems(first: 50) { edges { node { project { title} fieldValueByName(name: "Review 2") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }' > ./review2.json
+
+         jq '.' ./review1.json
+         jq '.' ./review2.json
         done
 
