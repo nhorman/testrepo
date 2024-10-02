@@ -15,7 +15,7 @@ on:
         type: choice
         options:
         - approved
-        - request_change
+        - changes_requested 
         - dismissed
       pr_number:
         description: 'pr to act on'
@@ -51,7 +51,7 @@ jobs:
         "approved")
           echo "ACTION_COLOR=GREEN" >> $GITHUB_ENV
           ;;
-        "request_change")
+        "changes_requested")
           echo "ACTION_COLOR=RED" >> $GITHUB_ENV
           ;;
         "dismissed")
