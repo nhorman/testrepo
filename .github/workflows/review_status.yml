@@ -76,23 +76,27 @@ jobs:
           echo " ISSUE $i "
           gh api -F issue=$i -F reviewer="$REVIEWER" graphql -f query='query($issue: Int!, $reviewer: [String!]) { repository(owner:"nhorman", name:"testrepo") { issue(number: $issue) { projectItems(first: 50) { edges { node { id project {title id field(name:"Review 1") { ... on ProjectV2SingleSelectField { id options(names: $reviewer) { id color} } } } fieldValueByName(name: "Review 1") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }' > ./review1.json
 
-          jq '.' ./review1.json
-          ASSIGNED_REVIEWER=$(jq -r '.data.repository.issue.projectItems.edges[0].node.fieldValueByName.status' ./review1.json)
-          PROJECT_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.project.id' ./review1.json)
-          FIELD_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.project.field.id' ./review1.json)
-          ITEM_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.id' ./review1.json)
-          COLOR_OPTION=$(jq -r --arg color "$ACTION_COLOR" '.data.repository.issue.projectItems.edges[0].node.project.field.options[] | select(.color==$color) | .id' ./review1.json)
-          echo "ASSIGNED REVIEWER $ASSIGNED_REVIEWER"
-          echo "FIELD ID $FIELD_ID"
-          echo "PROJECT ID $PROJECT_ID"
-          echo "ITEM ID $ITEM_ID"
-          echo "ACTION COLOR $ACTION_COLOR"
-          echo "COLOR OPTION $COLOR_OPTION"
-        
-          if [ "$ASSIGNED_REVIEWER" == "$REVIEWER" ]
-          then
-            echo "REVIEW 1 MATCH"
-            gh api graphql -F projectid="$PROJECT_ID" -F itemid="$ITEM_ID" -F fieldid="$FIELD_ID" -F coloroption="$COLOR_OPTION" -f query=' mutation($projectid: ID! $itemid: ID! $fieldid: ID! $coloroption: String) { updateProjectV2ItemFieldValue(input: {projectId: $projectid itemId: $itemid fieldId: $fieldid value: { singleSelectOptionId: $coloroption }}) {clientMutationId projectV2Item { id } } }'
-          fi
+          gh api -F issue=$i -F reviewer="$REVIEWER" graphql -f query='query($issue: Int!, $reviewer: [String!]) { repository(owner:"nhorman", name:"testrepo") { issue(number: $issue) { projectItems(first: 51) { edges { node { id project {title id field(name:"Review 1") { ... on ProjectV2SingleSelectField { id options(names: $reviewer) { id color} } } } fieldValueByName(name: "Review 1") { ... on ProjectV2ItemFieldSingleSelectValue { status: name color } } } } } } } }' > ./review2.json
+
+          for rev in review1.json review2.json
+          do
+            ASSIGNED_REVIEWER=$(jq -r '.data.repository.issue.projectItems.edges[0].node.fieldValueByName.status' ./review1.json)
+            PROJECT_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.project.id' ./review1.json)
+            FIELD_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.project.field.id' ./review1.json)
+            ITEM_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.id' ./review1.json)
+            COLOR_OPTION=$(jq -r --arg color "$ACTION_COLOR" '.data.repository.issue.projectItems.edges[0].node.project.field.options[] | select(.color==$color) | .id' ./review1.json)
+            echo "ASSIGNED REVIEWER $ASSIGNED_REVIEWER"
+            echo "FIELD ID $FIELD_ID"
+            echo "PROJECT ID $PROJECT_ID"
+            echo "ITEM ID $ITEM_ID"
+            echo "ACTION COLOR $ACTION_COLOR"
+            echo "COLOR OPTION $COLOR_OPTION"
+          
+            if [ "$ASSIGNED_REVIEWER" == "$REVIEWER" ]
+            then
+              echo "REVIEW 1 MATCH"
+              gh api graphql -F projectid="$PROJECT_ID" -F itemid="$ITEM_ID" -F fieldid="$FIELD_ID" -F coloroption="$COLOR_OPTION" -f query=' mutation($projectid: ID! $itemid: ID! $fieldid: ID! $coloroption: String) { updateProjectV2ItemFieldValue(input: {projectId: $projectid itemId: $itemid fieldId: $fieldid value: { singleSelectOptionId: $coloroption }}) {clientMutationId projectV2Item { id } } }'
+            fi
+          done
         done
 
