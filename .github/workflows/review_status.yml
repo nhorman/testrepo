@@ -91,7 +91,7 @@ jobs:
           if [ "$ASSIGNED_REVIEWER" == "$REVIEWER" ]
           then
             echo "REVIEW 1 MATCH"
-            gh api graphql -F projectid="$PROJECT_ID" -F itemid="ITEM_ID" -F fieldid="$FIELD_ID" -F coloroption="$COLOR_OPTION" -f query=' mutation($projectid: ID! $itemid: ID! $fieldid: ID! $coloroption: String) { updateProjectV2ItemFieldValue(input: {projectId: $projectid itemId: $itemid fieldId: $fieldid value: { singleSelectOptionId: $coloroption }}) {clientMutationId projectV2Item { id } } }'
+            gh api graphql -F projectid="$PROJECT_ID" -F itemid="$ITEM_ID" -F fieldid="$FIELD_ID" -F coloroption="$COLOR_OPTION" -f query=' mutation($projectid: ID! $itemid: ID! $fieldid: ID! $coloroption: String) { updateProjectV2ItemFieldValue(input: {projectId: $projectid itemId: $itemid fieldId: $fieldid value: { singleSelectOptionId: $coloroption }}) {clientMutationId projectV2Item { id } } }'
           fi
         done
 
