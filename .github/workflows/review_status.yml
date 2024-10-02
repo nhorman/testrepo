@@ -59,7 +59,7 @@ jobs:
         "approved")
           echo "ACTION_COLOR=GREEN" >> $GITHUB_ENV
           ;;
-        "changes_requested")
+        "request_change")
           echo "ACTION_COLOR=RED" >> $GITHUB_ENV
           ;;
         "dismiss")
