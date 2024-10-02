@@ -81,7 +81,7 @@ jobs:
           PROJECT_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.project.id' ./review1.json)
           FIELD_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.project.field.id' ./review1.json)
           ITEM_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.id' ./review1.json)
-          COLOR_OPTION=$(jq -r --arg color "$ACTION_COLOR" '.data.repository.issue.projectItems.edges[0].node.project.field.options[] | select(.color==$color) | .id')
+          COLOR_OPTION=$(jq -r --arg color "$ACTION_COLOR" '.data.repository.issue.projectItems.edges[0].node.project.field.options[] | select(.color==$color) | .id' ./review1.json)
           echo "ASSIGNED REVIEWER $ASSIGNED_REVIEWER"
           echo "FIELD ID $FIELD_ID"
           echo "PROJECT ID $PROJECT_ID"
