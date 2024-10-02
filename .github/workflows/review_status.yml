@@ -16,7 +16,7 @@ on:
         options:
         - approve
         - request_change
-        - dismiss
+        - dismissed
       pr_number:
         description: 'pr to act on'
         required: true
@@ -48,13 +48,13 @@ jobs:
     - name: "Select change color"
       run: |
         case "$ACTION" in
-        "approved")
+        "approve")
           echo "ACTION_COLOR=GREEN" >> $GITHUB_ENV
           ;;
         "request_change")
           echo "ACTION_COLOR=RED" >> $GITHUB_ENV
           ;;
-        "dismiss")
+        "dismissed")
           echo "ACTION_COLOR=GRAY" >> $GITHUB_ENV
           ;;
         esac
