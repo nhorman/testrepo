@@ -14,7 +14,7 @@ on:
         required: true
         type: choice
         options:
-        - approve
+        - approved
         - request_change
         - dismissed
       pr_number:
@@ -48,7 +48,7 @@ jobs:
     - name: "Select change color"
       run: |
         case "$ACTION" in
-        "approve")
+        "approved")
           echo "ACTION_COLOR=GREEN" >> $GITHUB_ENV
           ;;
         "request_change")
