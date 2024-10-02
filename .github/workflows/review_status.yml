@@ -42,15 +42,7 @@ jobs:
         elif [ "${{ github.event_name }}" == "pull_request_review" ]
         then
           echo "REVIEWER=${{ github.event.review.user.login }}" >> $GITHUB_ENV
-          if [ "${{ github.event.review.state }}" == "approved" ]
-          then
-            echo "ACTION=approve" >> $GITHUB_ENV
-          elif [ "${{ github.event.review.state }}" == "changes_requested" ]
-          then
-            echo "ACTION=request_change" >> $GITHUB_ENV
-          else
-            echo "ACTION=dismiss" >> $GITHUB_ENV
-          fi
+          echo "ACTION=${{ github.event.review.state }}" >> $GITHUB_ENV
           echo "PR_NUM=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
         fi
     - name: "Select change color"
