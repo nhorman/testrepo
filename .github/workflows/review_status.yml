@@ -63,7 +63,7 @@ jobs:
           echo "ACTION_COLOR=RED" >> $GITHUB_ENV
           ;;
         "dismiss")
-          echo "ACTION_COLOR=GREY" >> $GITHUB_ENV
+          echo "ACTION_COLOR=GRAY" >> $GITHUB_ENV
           ;;
         esac
     - name: "Identify associated issues"
@@ -82,11 +82,12 @@ jobs:
           FIELD_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.project.field.id' ./review1.json)
           ITEM_ID=$(jq -r '.data.repository.issue.projectItems.edges[0].node.id' ./review1.json)
           COLOR_OPTION=$(jq -r --arg color "$ACTION_COLOR" '.data.repository.issue.projectItems.edges[0].node.project.field.options[] | select(.color==$color) | .id')
-          echo "$ASSIGNED_REVIEWER"
-          echo "$FIELD_ID"
-          echo "$PROJECT_ID"
-          echo "$ITEM_ID"
-          echo "$COLOR_OPTION"
+          echo "ASSIGNED REVIEWER $ASSIGNED_REVIEWER"
+          echo "FIELD ID $FIELD_ID"
+          echo "PROJECT ID $PROJECT_ID"
+          echo "ITEM ID $ITEM_ID"
+          echo "ACTION COLOR $ACTION_COLOR"
+          echo "COLOR OPTION $COLOR_OPTION"
         
           if [ "$ASSIGNED_REVIEWER" == "$REVIEWER" ]
           then
